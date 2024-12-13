@@ -1,8 +1,12 @@
 # Fast fragment parser for Android written in C++ 20
 
+## How to compile and run 
 
+```sh
+zig c++ -std=c++2a -O3 -g0 fragmentdumper.cpp && a "adb -s 127.0.0.1:5565 shell dumpsys activity top -a -c
+```
 
-# How to use it in Python
+##  How to use it in Python
 ```py
 
 import pandas as pd
@@ -20,6 +24,8 @@ def cropimage(img, coords):
 
 imx = cv2.imread(r"C:\ProgramData\anaconda3\envs\a0\mypngfile.png")
 add_printer(1)
+# Example of a dump file 
+# https://github.com/hansalemaos/android_fragment_parser/blob/main/forpandascsv.csv
 df = pd.read_csv(r"c:\forpandascsv.csv")
 df.ds_color_print_all()
 for key, item in df.iterrows():
