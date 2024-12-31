@@ -511,7 +511,7 @@ int main(int argc, char *argv[])
         cmd = argv[1];
     }
     FILE *pipe = NULL;
-    static constexpr size_t size_my_buffer = 32;
+    static constexpr size_t size_my_buffer = 8192;
     char buffer[size_my_buffer]{};
     pipe = EXEC_CMD(cmd.c_str(), "r");
     if (!pipe)
