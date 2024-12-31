@@ -500,7 +500,7 @@ int main(int argc, char *argv[])
     if (argc < 2)
     {
         cmd = "dumpsys activity top -a -c --checkin";
-        /* zig c++ -std=c++2a -O3 -g0 fragmentdumper.cpp && a "adb -s 127.0.0.1:5565 shell dumpsys activity top -a -c
+        /* zig c++ -std=c++2a -O3 -g0 fragmentdumper.cpp && a "adb -s 127.0.0.1:5556 shell dumpsys activity top -a -c
         --checkin" */
 
         /* g++ - 12 - fpermissive - std = c++2a - O2 - g0 fragmentdumper.cpp && ./a.out "adb -s 127.0.0.1:5565 shell
@@ -511,14 +511,8 @@ int main(int argc, char *argv[])
         cmd = argv[1];
     }
     FILE *pipe = NULL;
-    constexpr size_t size_my_buffer = 4096;
-    char *buffer = (char *)malloc(size_my_buffer);
-    if (!buffer)
-    {
-        std::cerr << "ERROR: failed to allocate buffer" << std::endl;
-        return 1;
-    }
-    memset(buffer, 0, size_my_buffer);
+    static constexpr size_t size_my_buffer = 32;
+    char buffer[size_my_buffer]{};
     pipe = EXEC_CMD(cmd.c_str(), "r");
     if (!pipe)
     {
@@ -528,12 +522,11 @@ int main(int argc, char *argv[])
     std::string cpptmpstring;
     cpptmpstring.reserve(1024);
     std::vector<std::string> stringvector;
-    size_t last_view_hierachy_index = 0;
-    size_t last_looper_index = 0;
+    size_t last_view_hierachy_index{};
+    size_t last_looper_index{};
     while (fgets(buffer, size_my_buffer, pipe) != NULL)
     {
-        // try {
-        for (int i = 0; i < size_my_buffer; i++)
+        for (size_t i{}; i < size_my_buffer; i++)
         {
             if (buffer[i] == '\0')
             {
@@ -548,7 +541,6 @@ int main(int argc, char *argv[])
                     cpptmpstring.pop_back();
                 }
 #endif
-                // cpptmpstring.append("\n");
                 stringvector.emplace_back(cpptmpstring);
                 if (find_start_index_of_substring(cpptmpstring, viewhierachystring) != -1)
                 {
@@ -568,11 +560,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    CLOSE_CMD(pipe);
-    free(buffer);
     std::string str;
-    str.reserve(4096);
-    bool found_first_with_curly_braces_end = false;
+    str.reserve(40960);
+    bool found_first_with_curly_braces_end{false};
     for (size_t i = last_view_hierachy_index + 0; i < last_looper_index; i++)
     {
         if ((!found_first_with_curly_braces_end))
@@ -592,4 +582,7 @@ int main(int argc, char *argv[])
     }
     std::string csvresult{fragment_dump_to_csv(str)};
     std::cout << csvresult << std::endl;
+    return 0;
+    // Let the os do the cleanup
+    // CLOSE_CMD(pipe);
 }
