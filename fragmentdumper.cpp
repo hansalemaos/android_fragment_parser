@@ -582,7 +582,8 @@ int main(int argc, char *argv[])
     }
     std::string csvresult{fragment_dump_to_csv(str)};
     std::cout << csvresult << std::endl;
+    CLOSE_CMD(pipe);
     return 0;
-    // Let the os do the cleanup
-    // CLOSE_CMD(pipe);
+    
+    
 }
