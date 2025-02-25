@@ -516,7 +516,6 @@ int main(int argc, char *argv[])
     {
         cmd = argv[1];
     }
-    std::cout << "cmd: " << cmd << std::endl;
     FILE *pipe = NULL;
     static constexpr size_t size_my_buffer = 8192;
     char buffer[size_my_buffer]{};
@@ -566,7 +565,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-    std::cout << cpptmpstring;
     std::string str;
     str.reserve(40960);
     bool found_first_with_curly_braces_end{false};
