@@ -175,7 +175,13 @@ static std::vector<fragment_data> parse_raw_elements(std::string_view str)
         if (end_str_hashcode != -1)
         {
             dataline.HASHCODE = r_without_leading_spaces.substr(0, end_str_hashcode);
-            dataline.HASHCODE_INT = std::stoi(dataline.HASHCODE, nullptr, 16);
+            try
+            {
+                dataline.HASHCODE_INT = std::stoi(dataline.HASHCODE, nullptr, 16);
+            }
+            catch (...)
+            {
+            }
             r_without_leading_spaces = r_without_leading_spaces.substr(end_str_hashcode + 1);
         }
 
@@ -510,6 +516,7 @@ int main(int argc, char *argv[])
     {
         cmd = argv[1];
     }
+    std::cout << "cmd: " << cmd << std::endl;
     FILE *pipe = NULL;
     static constexpr size_t size_my_buffer = 8192;
     char buffer[size_my_buffer]{};
@@ -559,7 +566,7 @@ int main(int argc, char *argv[])
             }
         }
     }
-
+    std::cout << cpptmpstring;
     std::string str;
     str.reserve(40960);
     bool found_first_with_curly_braces_end{false};
@@ -584,6 +591,4 @@ int main(int argc, char *argv[])
     std::cout << csvresult << std::endl;
     CLOSE_CMD(pipe);
     return 0;
-    
-    
 }
