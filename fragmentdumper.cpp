@@ -141,6 +141,16 @@ static std::array<int, 4> get_coords(std::string_view &s)
     return v;
 }
 
+void ltrim(std::string &s)
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+}
+
+void rtrim(std::string &s)
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+}
+
 static std::vector<fragment_data> parse_raw_elements(std::string_view str)
 {
     auto strs = str | std::views::split('\n');
@@ -168,6 +178,11 @@ static std::vector<fragment_data> parse_raw_elements(std::string_view str)
         {
             dataline.CLASSNAME = r_without_leading_spaces.substr(0, end_str_classname);
             r_without_leading_spaces = r_without_leading_spaces.substr(end_str_classname + 1);
+            if (dataline.CLASSNAME.find("Looper ") != std::string::npos)
+            {
+                resultvector.pop_back();
+                continue;
+            }
         }
         ////////////////////////////////////////////////////////////////////////////////
         // HASHCODE
@@ -175,12 +190,33 @@ static std::vector<fragment_data> parse_raw_elements(std::string_view str)
         if (end_str_hashcode != -1)
         {
             dataline.HASHCODE = r_without_leading_spaces.substr(0, end_str_hashcode);
+            ltrim(dataline.HASHCODE);
+            rtrim(dataline.HASHCODE);
             try
             {
+
+                if (dataline.HASHCODE.empty())
+                {
+                    resultvector.pop_back();
+                    continue;
+                }
+                if (dataline.HASHCODE.find_first_not_of("0123456789abcdef") != std::string::npos)
+                {
+                    resultvector.pop_back();
+                    continue;
+                }
+
                 dataline.HASHCODE_INT = std::stoi(dataline.HASHCODE, nullptr, 16);
+                if (dataline.HASHCODE_INT == 0)
+                {
+                    resultvector.pop_back();
+                    continue;
+                }
             }
             catch (...)
             {
+                resultvector.pop_back();
+                continue;
             }
             r_without_leading_spaces = r_without_leading_spaces.substr(end_str_hashcode + 1);
         }
